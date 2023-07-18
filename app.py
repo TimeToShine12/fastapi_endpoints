@@ -21,7 +21,7 @@ def get_db():
         return conn
 
 
-@app.get("/user", summary="Get user by id")
+@app.get("/user/{id}", summary="Get user by id")
 def get_user(id: int, db: connection = Depends(get_db)):
     with db.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(
