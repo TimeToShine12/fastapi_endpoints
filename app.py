@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
 import psycopg2
 import uvicorn
@@ -46,7 +46,11 @@ def get_post_by_id(id: int, db: connection = Depends(get_db)):
             """,
             {'id': id}
         )
-        return cursor.fetchall()
+        result = cursor.fetchall()
+        if not result:
+            raise HTTPException(404, 'Error 404')
+        else:
+            return result
 
 
 # Для доступа к переменным окружения
