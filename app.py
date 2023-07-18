@@ -21,22 +21,38 @@ def get_db():
         return conn
 
 
-@app.get("/user")
-def get_user(id: int, limit: int = 10, db: connection = Depends(get_db)):
+@app.get("/user", summary="Get user by id")
+def get_user(id: int, db: connection = Depends(get_db)):
     with db.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(
             """
             SELECT *
             FROM "user"
             WHERE id= %(id)s
-            LIMIT %(limit)s
             """,
-            {'limit': limit, 'id': id}
+            {'id': id}
         )
         return cursor.fetchall()
 
+
+@app.get("/post/{id}", summary="Get post by id")
+def get_post_by_id(id: int, db: connection = Depends(get_db)):
+    with db.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.execute(
+            """
+            SELECT *
+            FROM post
+            WHERE id= %(id)s
+            """,
+            {'id': id}
+        )
+        return cursor.fetchall()
+
+
 # Для доступа к переменным окружения
 # вызываем метод load_dotenv из библиотеки dotenv
+
+
 if __name__ == '__main__':
     load_dotenv()
     uvicorn.run(app)
