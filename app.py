@@ -12,20 +12,22 @@ from typing import List
 app = FastAPI()
 
 
+# Получаем user по id
 @app.get("/user/{id}", response_model=UserGet, summary="Get user by id")
 def get_user(id: int, db: Session = Depends(get_db)):
     result = db.query(User).filter(User.id == id).one_or_none()
     if not result:
-        raise HTTPException(404, 'Error 404')
+        raise HTTPException(404, f'User with id = {id} not found')
     else:
         return result
 
 
+# Получаем post по id
 @app.get("/post/{id}", response_model=PostGet, summary="Get post by id")
-def get_post(id: int = 1, db: Session = Depends(get_db)):
+def get_post(id: int, db: Session = Depends(get_db)):
     result = db.query(Post).filter(Post.id == id).one_or_none()
     if not result:
-        raise HTTPException(404, 'Error 404')
+        raise HTTPException(404, f'Post with id = {id} not found')
     else:
         return result
 
@@ -47,16 +49,6 @@ def get_post_feed(id: int, limit: int = 10, db: Session = Depends(get_db)):
         .filter(Post.id == id)\
         .order_by(Feed.time.desc())\
         .limit(limit)\
-        .all()
-
-
-@app.get("/user/{id}/feedrelation", summary="By Post id")
-def get_user_feed(id: int, limit: int = 10, db: Session = Depends(get_db)):
-    return db.query(Feed) \
-        .join(Post) \
-        .filter(Post.id == id) \
-        .order_by(Feed.time.desc()) \
-        .limit(limit) \
         .all()
 
 
